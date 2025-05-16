@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Resume Submission</title>
+</head>
+<body>
+  <h2>Submit Your Resume</h2>
+  <form action="https://your-n8n.cloud/webhook/job-resume-submit" method="post" enctype="multipart/form-data">
+    <label><b>Upload Your Resume (.docx only):</b></label><br>
+    <input type="file" name="resume" required><br><br>
+
+    <label><b>Option A: Enter Job Title (e.g., Data Analyst):</b></label><br>
+    <input type="text" name="jobRole" placeholder="Data Analyst"><br><br>
+
+    <label><b>Option B: Paste Job URL (LinkedIn/Indeed etc.):</b></label><br>
+    <input type="url" name="jobURL" placeholder="https://..."><br><br>
+
+    <input type="submit" value="Submit">
+  </form>
+</body>
+</html>
