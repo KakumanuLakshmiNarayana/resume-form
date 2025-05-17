@@ -1,21 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Resume Submission</title>
+  <title>ATS Resume Builder</title>
 </head>
 <body>
-  <h2>Submit Your Resume</h2>
+  <h2>ATS Resume Builder Form</h2>
   <form action="https://avinari32.app.n8n.cloud/webhook/resume-submit" method="POST" enctype="multipart/form-data">
-    <label><b>Upload Your Resume (.docx only):</b></label><br>
-    <input type="file" name="resume" required><br><br>
+    
+    <label for="inputType">Input Type:</label><br>
+    <select name="inputType" required>
+      <option value="basic_resume">Upload Resume</option>
+      <option value="basic_details">Provide Employment & Education Details</option>
+    </select>
+    <br><br>
 
-    <label><b>Option A: Enter Job Title (e.g., Data Analyst):</b></label><br>
-    <input type="text" name="jobRole" placeholder="Data Analyst"><br><br>
+    <div id="resumeUpload">
+      <label for="basicResumeFile">Upload Resume File:</label><br>
+      <input type="file" name="basicResumeFile" accept=".pdf,.doc,.docx,.txt">
+    </div>
 
-    <label><b>Option B: Paste Job URL (LinkedIn/Indeed etc.):</b></label><br>
-    <input type="url" name="jobURL" placeholder="https://..."><br><br>
+    <div id="employmentDetails" style="display:none;">
+      <label for="employmentDetails">Paste Employment and Education Details:</label><br>
+      <textarea name="employmentDetails" rows="6" cols="60" placeholder="Example: Software Engineer at ABC Corp (2018–2022)..."></textarea>
+    </div>
+    <br>
 
-    <input type="submit" value="Submit">
+    <label for="jobDescription">Paste Job Description:</label><br>
+    <textarea name="jobDescription" rows="6" cols="60" placeholder="Paste job description or leave blank if using URL"></textarea><br><br>
+
+    <label for="jobURL">OR Provide Job Description URL:</label><br>
+    <input type="url" name="jobURL" placeholder="https://example.com/job/123"><br><br>
+
+    <label for="customKeywords">Any Specific Keywords (Optional):</label><br>
+    <input type="text" name="customKeywords" placeholder="e.g., ETL, Tableau, Python"><br><br>
+
+    <button type="submit">Submit</button>
   </form>
+
+  <script>
+    // Show/hide form fields based on inputType
+    const inputType = document.querySelector('select[name="inputType"]');
+    const resumeUpload = document.getElementById('resumeUpload');
+    const employmentDetails = document.getElementById('employmentDetails');
+
+    inputType.addEventListener('change', function () {
+      if (this.value === 'basic_resume') {
+        resumeUpload.style.display = 'block';
+        employmentDetails.style.display = 'none';
+      } else {
+        resumeUpload.style.display = 'none';
+        employmentDetails.style.display = 'block';
+      }
+    });
+  </script>
 </body>
 </html>
+
