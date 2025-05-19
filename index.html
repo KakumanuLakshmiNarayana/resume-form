@@ -1,58 +1,100 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>ATS Resume Builder</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Description Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        input[type="file"] {
+            display: block;
+            margin: 20px auto;
+            font-size: 16px;
+        }
+        .upload-btn {
+            display: block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .upload-btn:hover {
+            background-color: #45a049;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <h2>ATS Resume Builder Form</h2>
-  <form action="https://avinari32.app.n8n.cloud/webhook/ats-resume-builder" method="POST" enctype="multipart/form-data">
-    
-    <label for="inputType">Input Type:</label><br>
-    <select name="inputType" required>
-      <option value="basic_resume">Upload Resume</option>
-      <option value="basic_details">Provide Employment & Education Details</option>
-    </select>
-    <br><br>
 
-    <div id="resumeUpload">
-      <label for="basicResumeFile">Upload Resume File:</label><br>
-      <input type="file" name="basicResumeFile" accept=".pdf,.doc,.docx,.txt">
+    <div class="container">
+        <h1>Upload Job Description</h1>
+        <form id="jdForm" enctype="multipart/form-data">
+            <input type="file" name="jdFile" id="jdFile" accept=".pdf, .docx, .txt" required>
+            <button type="submit" class="upload-btn">Upload JD</button>
+        </form>
+
+        <div class="loading" id="loading">Processing your JD...</div>
     </div>
 
-    <div id="employmentDetails" style="display:none;">
-      <label for="employmentDetails">Paste Employment and Education Details:</label><br>
-      <textarea name="employmentDetails" rows="6" cols="60" placeholder="Example: Software Engineer at ABC Corp (2018–2022)..."></textarea>
-    </div>
-    <br>
+    <script>
+        document.getElementById("jdForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            
+            // Show loading indicator
+            document.getElementById("loading").style.display = "block";
 
-    <label for="jobDescription">Paste Job Description:</label><br>
-    <textarea name="jobDescription" rows="6" cols="60" placeholder="Paste job description or leave blank if using URL"></textarea><br><br>
+            const formData = new FormData();
+            const fileInput = document.getElementById("jdFile");
+            formData.append("jdFile", fileInput.files[0]);
 
-    <label for="jobURL">OR Provide Job Description URL:</label><br>
-    <input type="url" name="jobURL" placeholder="https://example.com/job/123"><br><br>
-
-    <label for="customKeywords">Any Specific Keywords (Optional):</label><br>
-    <input type="text" name="customKeywords" placeholder="e.g., ETL, Tableau, Python"><br><br>
-
-    <button type="submit">Submit</button>
-  </form>
-
-  <script>
-    // Show/hide form fields based on inputType
-    const inputType = document.querySelector('select[name="inputType"]');
-    const resumeUpload = document.getElementById('resumeUpload');
-    const employmentDetails = document.getElementById('employmentDetails');
-
-    inputType.addEventListener('change', function () {
-      if (this.value === 'basic_resume') {
-        resumeUpload.style.display = 'block';
-        employmentDetails.style.display = 'none';
-      } else {
-        resumeUpload.style.display = 'none';
-        employmentDetails.style.display = 'block';
-      }
-    });
-  </script>
+            // Change the URL to your n8n webhook endpoint
+            const webhookUrl = "https://avinari32.app.n8n.cloud/webhook/upload-jd"; // Replace with your actual webhook URL
+            
+            // Send the JD file to n8n webhook
+            fetch(webhookUrl, {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide loading indicator
+                document.getElementById("loading").style.display = "none";
+                
+                // Handle the response data from n8n (you can display the tailored resume or notify the user)
+                alert("Job Description processed successfully! Check your email for the tailored resume.");
+            })
+            .catch(error => {
+                // Hide loading indicator and show error message
+                document.getElementById("loading").style.display = "none";
+                alert("Error processing JD. Please try again.");
+            });
+        });
+    </script>
 </body>
 </html>
-
