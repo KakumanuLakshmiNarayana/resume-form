@@ -1,161 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Description Upload or Paste</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f9;
-        }
-        .container {
-            max-width: 800px;
-            margin: auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        input[type="file"], textarea {
-            display: block;
-            margin: 20px auto;
-            font-size: 16px;
-            width: 100%;
-        }
-        .upload-btn {
-            display: block;
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-        }
-        .upload-btn:hover {
-            background-color: #45a049;
-        }
-        .loading {
-            display: none;
-            text-align: center;
-            margin-top: 20px;
-        }
-        .option-container {
-            margin: 20px 0;
-        }
-        .option-container input {
-            margin-right: 10px;
-        }
-    </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Paste Job Description</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f9; padding: 20px; }
+    .container { max-width: 800px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    h1 { text-align: center; color: #333; }
+    textarea { width: 100%; font-size: 16px; margin: 20px 0; padding: 10px; }
+    button { width: 100%; padding: 12px; background: #4CAF50; color: #fff; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }
+    button:hover { background: #45a049; }
+    .loading { display: none; text-align: center; margin-top: 20px; color: #555; }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <h1>Paste Job Description</h1>
+    <textarea id="jdText" rows="12" placeholder="Paste the full job description here..."></textarea>
+    <button id="submitBtn">Generate Tailored Resume Points</button>
+    <div class="loading" id="loading">Processing… please wait.</div>
+  </div>
 
-    <div class="container">
-        <h1>Upload or Paste Job Description</h1>
-        
-        <!-- Option to choose between file upload or pasting JD -->
-        <div class="option-container">
-            <label>
-                <input type="radio" name="uploadOption" id="uploadFileOption" checked> Upload JD File
-            </label>
-            <label>
-                <input type="radio" name="uploadOption" id="pasteJDOption"> Paste JD Text
-            </label>
-        </div>
+  <script>
+    const submitBtn = document.getElementById('submitBtn');
+    const loading = document.getElementById('loading');
 
-        <!-- File Upload Option -->
-        <div id="uploadFileSection">
-            <input type="file" name="jdFile" id="jdFile" accept=".pdf, .docx, .txt">
-            <button type="submit" class="upload-btn" id="fileUploadButton">Upload JD File</button>
-        </div>
+    submitBtn.addEventListener('click', async () => {
+      const jdText = document.getElementById('jdText').value.trim();
+      if (!jdText) return alert('Please paste your job description.');
 
-        <!-- Paste JD Text Option -->
-        <div id="pasteJDSection" style="display: none;">
-            <textarea id="jdText" rows="10" placeholder="Paste your job description here..."></textarea>
-            <button type="submit" class="upload-btn" id="pasteJDButton">Submit JD Text</button>
-        </div>
-
-        <div class="loading" id="loading">Processing your JD...</div>
-    </div>
-
-    <script>
-        // Toggle between file upload and paste JD input
-        document.querySelectorAll('input[name="uploadOption"]').forEach((radio) => {
-            radio.addEventListener('change', function() {
-                if (document.getElementById('uploadFileOption').checked) {
-                    document.getElementById('uploadFileSection').style.display = 'block';
-                    document.getElementById('pasteJDSection').style.display = 'none';
-                } else {
-                    document.getElementById('uploadFileSection').style.display = 'none';
-                    document.getElementById('pasteJDSection').style.display = 'block';
-                }
-            });
+      loading.style.display = 'block';
+      try {
+        const res = await fetch('https://avinari32.app.n8n.cloud/webhook/jd-input', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jobDescription: jdText })
         });
+        const result = await res.text();
+        loading.style.display = 'none';
 
-        // Handle file upload
-        document.getElementById("fileUploadButton").addEventListener("click", function(event) {
-            event.preventDefault();
-            document.getElementById("loading").style.display = "block";
-
-            const formData = new FormData();
-            const fileInput = document.getElementById("jdFile");
-            formData.append("jdFile", fileInput.files[0]);
-
-            // Change the URL to your n8n webhook endpoint
-            const webhookUrl = "https://avinari32.app.n8n.cloud/webhook/upload-jd"; // Replace with your actual webhook URL
-
-            fetch(webhookUrl, {
-                method: "POST",
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("loading").style.display = "none";
-                alert("Job Description processed successfully! Check your email for the tailored resume.");
-            })
-            .catch(error => {
-                document.getElementById("loading").style.display = "none";
-                alert("Error processing JD. Please try again.");
-            });
-        });
-
-        // Handle JD text submission
-        document.getElementById("pasteJDButton").addEventListener("click", function(event) {
-            event.preventDefault();
-            document.getElementById("loading").style.display = "block";
-
-            const jdText = document.getElementById("jdText").value;
-
-            // Change the URL to your n8n webhook endpoint
-            const webhookUrl = "https://your-n8n-webhook-url.com"; // Replace with your actual webhook URL
-
-            fetch(webhookUrl, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ jobDescription: jdText })
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("loading").style.display = "none";
-                alert("Job Description processed successfully! Check your email for the tailored resume.");
-            })
-            .catch(error => {
-                document.getElementById("loading").style.display = "none";
-                alert("Error processing JD. Please try again.");
-            });
-        });
-    </script>
-
+        // Open a new window/tab with the generated points
+        const win = window.open();
+        win.document.body.innerHTML = `<pre style="white-space: pre-wrap; font-family: monospace;">${result}</pre>`;
+      } catch (err) {
+        loading.style.display = 'none';
+        alert('Error processing JD. Please try again.');
+      }
+    });
+  </script>
 </body>
 </html>
